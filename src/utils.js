@@ -38,7 +38,7 @@ export const loadScript = function (id, params) {
     ...(params || {})
   });
 
-  script.src   = `https://www.googletagmanager.com/gtm.js?id=${queryString}`
+  script.src   = `https://www.googletagmanager.com/gtm.js?${queryString}`
 
   doc.body.appendChild(script)
 }
