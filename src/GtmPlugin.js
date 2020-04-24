@@ -77,4 +77,16 @@ export default class AnalyticsPlugin {
       })
     }
   }
+
+  trackCustomEvent(event, data = {}) {
+    if (inBrowser && pluginConfig.enabled) {
+      const eventObj = {
+        'event' : event,
+        ...data
+      }
+      logDebug('Dispatching event', eventObj)
+      let dataLayer = (window.dataLayer = window.dataLayer || [])
+      dataLayer.push(eventObj)
+    }
+  }
 }
