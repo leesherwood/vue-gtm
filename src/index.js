@@ -15,6 +15,7 @@ const install = function (Vue, initConf = {}) {
   pluginConfig.id = initConf.id
   pluginConfig.debug = initConf.debug
   pluginConfig.enabled = initConf.enabled
+  pluginConfig.loadScript = initConf.loadScript
 
   // Handle vue-router if defined
   if (initConf.vueRouter) {
@@ -25,13 +26,13 @@ const install = function (Vue, initConf = {}) {
   Vue.prototype.$gtm = Vue.gtm = new GtmPlugin()
 
   // Load GTM script when enabled
-  if (pluginConfig.enabled) {
+  if (pluginConfig.enabled && pluginConfig.loadScript) {
     if (Array.isArray(initConf.id)) {
       initConf.id.forEach((id) => {
-        loadScript(id, initConf.queryParams);
+        loadScript(id, initConf);
       });
     } else {
-      loadScript(initConf.id, initConf.queryParams);
+      loadScript(initConf.id, initConf);
     }
   }
 }
@@ -61,12 +62,18 @@ const initVueRouterGuard = function (Vue, { vueRouter, ignoredViews, trackOnNext
     // Dispatch vue event using meta gtm value if defined otherwise fallback to route name
     const name = to.meta.gtm || to.name
     const baseUrl = vueRouter.options.base || '';
+    let fullUrl = baseUrl
+    if (!fullUrl.endsWith('/')) {
+      fullUrl += '/'
+    }
+    fullUrl += (to.fullPath.startsWith('/') ? to.fullPath.substr(1) : to.fullPath)
+
     if (trackOnNextTick) {
       Vue.nextTick(() => {
-        Vue.gtm.trackView(name, `${baseUrl}${to.fullPath}`)
+        Vue.gtm.trackView(name, fullUrl)
       })
     } else {
-      Vue.gtm.trackView(name, `${baseUrl}${to.fullPath}`)
+      Vue.gtm.trackView(name, fullUrl)
     }
   })
 
